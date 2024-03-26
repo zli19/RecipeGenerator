@@ -13,7 +13,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +51,7 @@ fun BookScreen(navController: NavController, mainViewModel: MainViewModel){
                     }
             ){
                 AsyncImage(
-                    model = it.images[0],
+                    model = it.pictures[0],
                     contentDescription = it.name,
                     modifier= Modifier
                         .fillMaxWidth()

@@ -2,6 +2,7 @@ package com.quentin.recipegenerator.data.db.roomdb
 
 import androidx.room.TypeConverter
 import com.quentin.recipegenerator.domain.model.Instruction
+import com.quentin.recipegenerator.domain.model.Picture
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -45,6 +46,26 @@ class RecipeConverters {
         val newValue =  adapter.fromJson(value)!!
         return newValue.map {
             Json.decodeFromString(Instruction.serializer(), it)
+        }
+    }
+
+    @TypeConverter
+    fun fromPhotoListType(value: List<Picture>): String{
+        val newValue = value.map {
+            Json.encodeToString(Picture.serializer(), it)
+        }
+        val adapter: JsonAdapter<List<String>> = moshi.adapter(stringListType)
+
+        return adapter.toJson(newValue)
+    }
+
+    @TypeConverter
+    fun toPhotoListType(value: String): List<Picture>{
+        val adapter: JsonAdapter<List<String>> = moshi.adapter(stringListType)
+
+        val newValue =  adapter.fromJson(value)!!
+        return newValue.map {
+            Json.decodeFromString(Picture.serializer(), it)
         }
     }
 }

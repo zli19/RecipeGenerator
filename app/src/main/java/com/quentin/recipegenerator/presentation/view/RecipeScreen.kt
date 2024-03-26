@@ -1,30 +1,20 @@
 package com.quentin.recipegenerator.presentation.view
 
-import android.widget.ImageButton
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -34,12 +24,9 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.quentin.recipegenerator.R
-import com.quentin.recipegenerator.domain.model.RecipeState
-import com.quentin.recipegenerator.domain.model.RecipeStatus
 import com.quentin.recipegenerator.presentation.ui.theme.Primary
 import com.quentin.recipegenerator.presentation.ui.theme.Secondary
 import com.quentin.recipegenerator.presentation.ui.theme.Stroke
-import com.quentin.recipegenerator.presentation.ui.theme.Tertiary
 import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
 
 @Composable
@@ -53,7 +40,7 @@ fun RecipeScreen(mainViewModel: MainViewModel){
                 .verticalScroll(rememberScrollState())
         ) {
             AsyncImage(
-                model = recipe.images[0],
+                model = recipe.pictures[0],
                 contentDescription = recipe.name,
                 modifier = Modifier
                     .fillMaxWidth()

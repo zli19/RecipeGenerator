@@ -46,6 +46,11 @@ android {
             "OPENAI_API_KEY",
             buildConfigProperty("OPENAI_API_KEY")
         )
+        buildConfigField(
+            "String",
+            "PEXELS_API_KEY",
+            buildConfigProperty("PEXELS_API_KEY")
+        )
     }
 
     buildTypes {

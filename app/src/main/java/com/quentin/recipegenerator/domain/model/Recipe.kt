@@ -1,15 +1,10 @@
 package com.quentin.recipegenerator.domain.model
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter.ofLocalizedDateTime
-import java.time.format.DateTimeFormatter.ofPattern
 
 @Serializable
 @Entity(tableName = "recipes")
@@ -19,6 +14,6 @@ data class Recipe(
     var ingredients: List<String>,
     var instructions: List<Instruction>,
     var name: String,
-    var images: List<String> = emptyList(),
+    var pictures: List<Picture> = emptyList(),
     var time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
 )

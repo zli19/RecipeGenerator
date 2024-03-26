@@ -1,4 +1,4 @@
-package com.quentin.recipegenerator.data.api.pixelapi.model
+package com.quentin.recipegenerator.data.api.pixelsapi.model
 
 data class Src(
     val landscape: String,
