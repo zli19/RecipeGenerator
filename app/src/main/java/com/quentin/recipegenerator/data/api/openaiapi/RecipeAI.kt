@@ -18,7 +18,7 @@ class RecipeAI @Inject constructor(
     private val openAI: OpenAI
 ) {
     // should be private after test its lifecycle
-    val chatMessages = mutableListOf<ChatMessage>(
+    private val chatMessages = mutableListOf(
         chatMessage {
             role = ChatRole.System
             content = """

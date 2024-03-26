@@ -1,17 +1,13 @@
 package com.quentin.recipegenerator.data.db.roomdb
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.quentin.recipegenerator.domain.model.Recipe
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Database(
-    entities = [Recipe::class],
+    entities = [Recipe1::class],
     version = 1,
     exportSchema = false
 )

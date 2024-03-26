@@ -9,9 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.quentin.recipegenerator.domain.model.Recipe
-import com.quentin.recipegenerator.domain.model.RecipeState
-import com.quentin.recipegenerator.domain.model.RecipeStatus
 import com.quentin.recipegenerator.domain.repository.RecipeRepository
 import com.quentin.recipegenerator.presentation.view.navigation.Destination
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +30,7 @@ class MainViewModel @Inject constructor(
 //
 //    private val _recipeBook = MutableStateFlow<List<Recipe>>(emptyList())
 //    val recipeBook: StateFlow<List<Recipe>> = _recipeBook
-    var recipeBook by mutableStateOf<List<Recipe>>(emptyList())
+    var recipeBook by mutableStateOf<List<Recipe1>>(emptyList())
 
     init {
         // Retrieve data from database
@@ -64,7 +61,7 @@ class MainViewModel @Inject constructor(
     }
 
 
-    fun pushRecipeToDisplay(recipe: Recipe, navController: NavController){
+    fun pushRecipeToDisplay(recipe: Recipe1, navController: NavController){
 //        _recipeState.value = _recipeState.value.copy(
         recipeState = recipeState.copy(
             recipe = recipe,

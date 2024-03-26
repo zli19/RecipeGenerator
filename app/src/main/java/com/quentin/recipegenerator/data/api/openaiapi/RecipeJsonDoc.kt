@@ -4,10 +4,23 @@ val recipeSchema = """
 {
     "name": "<The dish name>",
     "ingredients": [
-        "<Description of the first ingredient>",
-        "<Description of the second ingredient>",
-        "<Description of the third ingredient>"
+        {
+            "description": "<Description of the first ingredient>",
+            "nutrition": "<Nutritional information for the first ingredient>"
+        },
+        {
+            "description": "<Description of the second ingredient>",
+            "nutrition": "<Nutritional information for the second ingredient>"
+        },
+        {
+            "description": "<Description of the third ingredient>",
+            "nutrition": "<Nutritional information for the third ingredient>"
+        }
     ],
+    "serving": {
+        "number": "<Number of servings>",
+        "nutritionPerServing": "<Calculate nutrition values per serving based on number of servings and ingredients' nutritional information above>"
+    },
     "instructions": [
         {
             "title": "<Name of the first instruction>",
@@ -26,15 +39,43 @@ val assistantMessageSample = """
 {
     "name": "Grilled Onion Chicken",
     "ingredients": [
-        "4 boneless, skinless chicken breasts",
-        "2 large onions, thinly sliced",
-        "3 cloves garlic, minced",
-        "2 tablespoons olive oil",
-        "2 tablespoons balsamic vinegar",
-        "1 teaspoon dried thyme",
-        "1 teaspoon dried rosemary",
-        "Salt and pepper to taste"
+        {
+            "description": "4 boneless, skinless chicken breasts",
+            "nutrition": "Calories: 110 x 4 = 440 kcal, Protein: 24g x 4 = 96g, Fat: 1.5g x 4 = 6g, Carbohydrates: 0g x 4 = 0g"
+        },
+        {
+            "description": "2 large onions, thinly sliced",
+             "nutrition": "Calories: 44 x 2 = 88 kcal, Protein: 1.6g x 2 = 3.2g, Fat: 0.2g x 2 = 0.4g, Carbohydrates: 10g x 2 = 20g"
+        },
+        {
+            "description": "3 cloves garlic, minced",
+            "nutrition": "Calories: 4 kcal, Protein: 0.2g, Fat: 0g, Carbohydrates: 1g"
+        },
+        {
+            "description":  "2 tablespoons olive oil",
+            "nutrition": "Calories: 120 kcal, Fat: 14g, Protein: 0g, Carbohydrates: 0g"
+        },
+        {
+            "description": "2 tablespoons balsamic vinegar",
+            "nutrition": "Calories: 28 kcal, Fat: 0g, Protein: 0g, Carbohydrates: 7g"
+        },
+        {
+            "description": "1 teaspoon dried thyme",
+            "nutrition": "Calories: negligible (assuming less than 5 kcal)"
+        },
+        {
+             "description": "1 teaspoon dried rosemary",
+             "nutrition": "Calories: negligible (assuming less than 5 kcal)"
+        },
+        {
+            "description": "Salt and pepper to taste",
+            "nutrition": "Calories: Negligible (assuming less than 5 kcal)"
+        }
     ], 
+    "serving": {
+        "number" : 4,
+        "nutritionPerServing": "Calories: 170 kcal, Protein 24.85g, Fat 5.1g, Carbohydrates 7g"
+    },
     "instructions": [
         {
             "title": "Prepare the Marinade",

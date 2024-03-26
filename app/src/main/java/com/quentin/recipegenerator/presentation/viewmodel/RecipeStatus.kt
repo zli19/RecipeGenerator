@@ -1,4 +1,4 @@
-package com.quentin.recipegenerator.domain.model
+package com.quentin.recipegenerator.presentation.viewmodel
 
 enum class RecipeStatus {
     EMPTY,
