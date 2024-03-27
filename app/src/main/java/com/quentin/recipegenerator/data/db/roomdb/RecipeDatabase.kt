@@ -5,9 +5,10 @@ import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.quentin.recipegenerator.domain.model.Recipe
 
 @Database(
-    entities = [Recipe1::class],
+    entities = [Recipe::class],
     version = 1,
     exportSchema = false
 )

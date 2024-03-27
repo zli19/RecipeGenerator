@@ -18,16 +18,18 @@ abstract class RecipeDao {
     @Delete
     abstract suspend fun deleteRecipe(recipe: Recipe)
 
-    @Query("SELECT * FROM recipes ORDER BY time DESC")
-    abstract fun getRecipesOrderByTime(): Flow<List<Recipe>>
+    @Query("SELECT * FROM recipes")
+    abstract fun getRecipes(): Flow<List<Recipe>>
 
-    @Query("SELECT * FROM recipes ORDER BY name ASC")
-    abstract fun getRecipesOrderByName(): Flow<List<Recipe>>
+//    @Query("SELECT * FROM recipes ORDER BY time DESC")
+//    abstract fun getRecipesOrderByTime(): Flow<List<Recipe>>
+//    @Query("SELECT * FROM recipes ORDER BY name ASC")
+//    abstract fun getRecipesOrderByName(): Flow<List<Recipe>>
 
 
-    suspend fun upsertRecipeWithTimestamp(recipe: Recipe){
-        upsertRecipe(recipe.apply {
-            time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-        })
-    }
+//    suspend fun upsertRecipeWithTimestamp(recipe: Recipe){
+//        upsertRecipe(recipe.apply {
+//            time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+//        })
+//    }
 }

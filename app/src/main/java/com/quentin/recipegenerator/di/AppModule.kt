@@ -8,10 +8,10 @@ import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIConfig
 import com.quentin.recipegenerator.BuildConfig
-import com.quentin.recipegenerator.data.api.PixelsPictureService
+import com.quentin.recipegenerator.data.api.openaiapi.RecipeAIService
 import com.quentin.recipegenerator.data.db.RoomRecipeRepo
 import com.quentin.recipegenerator.domain.repository.RecipeRepository
-import com.quentin.recipegenerator.domain.service.PictureService
+import com.quentin.recipegenerator.domain.service.AIService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -43,14 +43,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRecipeRepository(@ApplicationContext context: Context): RecipeRepository{
-        return RoomRecipeRepo(context)
+    fun provideAIService(openAI: OpenAI): AIService{
+        return RecipeAIService(openAI)
     }
+
 
     @Provides
     @Singleton
-    fun providePictureService(): PictureService{
-        return PixelsPictureService()
+    fun provideRecipeRepository(@ApplicationContext context: Context): RecipeRepository {
+        return RoomRecipeRepo(context)
     }
-
 }

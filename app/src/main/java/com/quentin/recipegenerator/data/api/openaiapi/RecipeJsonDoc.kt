@@ -17,7 +17,7 @@ val recipeSchema = """
             "nutrition": "<Nutritional information for the third ingredient>"
         }
     ],
-    "serving": {
+    "servings": {
         "number": "<Number of servings>",
         "nutritionPerServing": "<Calculate nutrition values per serving based on number of servings and ingredients' nutritional information above>"
     },
@@ -72,8 +72,8 @@ val assistantMessageSample = """
             "nutrition": "Calories: Negligible (assuming less than 5 kcal)"
         }
     ], 
-    "serving": {
-        "number" : 4,
+    "servings": {
+        "number" : "4",
         "nutritionPerServing": "Calories: 170 kcal, Protein 24.85g, Fat 5.1g, Carbohydrates 7g"
     },
     "instructions": [

@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import com.quentin.recipegenerator.domain.model.Ingredient
 import com.quentin.recipegenerator.domain.model.Instruction
 import com.quentin.recipegenerator.domain.model.Picture
+import com.quentin.recipegenerator.domain.model.Servings
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -88,5 +89,15 @@ class RecipeConverters {
         return newValue.map {
             Json.decodeFromString(Ingredient.serializer(), it)
         }
+    }
+
+    @TypeConverter
+    fun fromServingsType(value: Servings): String{
+        return Json.encodeToString(Servings.serializer(), value)
+    }
+
+    @TypeConverter
+    fun toServingsType(value: String): Servings{
+        return Json.decodeFromString(Servings.serializer(), value)
     }
 }

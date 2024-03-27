@@ -40,7 +40,7 @@ fun RecipeScreen(mainViewModel: MainViewModel){
                 .verticalScroll(rememberScrollState())
         ) {
             AsyncImage(
-                model = recipe.pictures[0],
+                model = recipe.pictures?.first()?.landscape,
                 contentDescription = recipe.name,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -97,7 +97,7 @@ fun RecipeScreen(mainViewModel: MainViewModel){
                     )
                     recipe.ingredients.forEach{
                         Text(
-                            text = it,
+                            text = it.description,
                             modifier = Modifier
                                 .fillMaxWidth(),
                             fontSize = TextUnit(18f, TextUnitType.Sp),

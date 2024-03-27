@@ -9,16 +9,14 @@ import com.aallam.openai.api.chat.chatMessage
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import com.quentin.recipegenerator.domain.model.Recipe
+import com.quentin.recipegenerator.domain.service.AIService
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class RecipeAI @Inject constructor(
-    private val openAI: OpenAI
-) {
-    // should be private after test its lifecycle
-    private val chatMessages = mutableListOf(
+class RecipeAIService(private val openAI: OpenAI): AIService {
+
+    private val initialMessages = listOf(
         chatMessage {
             role = ChatRole.System
             content = """
@@ -35,9 +33,28 @@ class RecipeAI @Inject constructor(
             content = assistantMessageSample
         }
     )
-    private val modelId = ModelId("gpt-3.5-turbo-1106")
 
-    fun addUserMessage(message: String = "Generate a new recipe with the same ingredients above."){
+    private var chatMessages = mutableListOf<ChatMessage>()
+    private val modelId = ModelId("gpt-3.5-turbo-1106")
+    override suspend fun generateRecipe(ingredients: String): Recipe? {
+        // Initialize chatMessage list
+        chatMessages.clear()
+        chatMessages.addAll(initialMessages)
+        // Add user message of the ingredients to OpenAI chatMessages
+        addUserMessage(ingredients)
+        return generate()
+    }
+
+    override suspend fun regenerateRecipe(): Recipe? {
+        // Add default message for regeneration
+        addUserMessage()
+        return generate()
+    }
+
+    private fun addUserMessage(
+        // Default message for regeneration
+        message: String = "Generate a new recipe with the same ingredients above."
+    ){
         val chatMessage = ChatMessage(
             role = ChatRole.User,
             content = message
@@ -45,8 +62,10 @@ class RecipeAI @Inject constructor(
         chatMessages.add(chatMessage)
     }
 
-    suspend fun generate(): Recipe? {
-        Log.i("zhikun", "generating...")
+    private suspend fun generate(): Recipe? {
+
+        Log.i("zhikun", "generating...") //for testing
+
         val request = chatCompletionRequest {
             responseFormat = ChatResponseFormat.JsonObject
             model = modelId
@@ -58,17 +77,19 @@ class RecipeAI @Inject constructor(
 
 
         return if(content == null){
-            Log.i("zhikun", "Failed")
+            Log.i("zhikun", "Generation Failed")
             null
         }else{
+
+            // Add newly generated recipe result to chatMessages for potential future regeneration
             chatMessages.add(
                 ChatMessage(
                     role = ChatRole.Assistant,
                     content = content
                 )
             )
-            addUserMessage()
-            Log.i("zhikun", content)
+
+            Log.i("zhikun", content) //for testing
 
             Json.decodeFromString(Recipe.serializer(), content)
         }

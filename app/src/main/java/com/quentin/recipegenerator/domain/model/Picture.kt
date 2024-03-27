@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Picture(
-    val small: String,
+    val original: String,
     val landscape: String
 )

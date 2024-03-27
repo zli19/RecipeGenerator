@@ -1,6 +1,6 @@
 package com.quentin.recipegenerator.data.api.pixelsapi.model
 
-data class ResponseBody(
+data class PixelsData(
     val next_page: String,
     val page: Int,
     val per_page: Int,
