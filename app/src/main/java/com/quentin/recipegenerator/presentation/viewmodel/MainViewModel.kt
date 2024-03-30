@@ -1,10 +1,12 @@
 package com.quentin.recipegenerator.presentation.viewmodel
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -16,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+//@SuppressLint("MutableCollectionMutableState")
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: RecipeRepository,
@@ -28,25 +31,39 @@ class MainViewModel @Inject constructor(
     var recipeState by mutableStateOf(RecipeState())
 
     var recipeBook by mutableStateOf<List<Recipe>>(emptyList())
+    var featureMap = mutableStateMapOf<String, Int>()
 
     init {
         // Retrieve data from database
+        viewModelScope.launch {
+            repository.getAllRecipes().collectLatest { recipes ->
+                recipeBook = recipes
+                val map = HashMap<String, Int>()
+                for (feature in recipeBook.flatMap { it.features }) {
+                    map[feature] = map.getOrDefault(feature, 0) + 1
+                }
+                featureMap.putAll(map.toList().sortedBy { -it.second }.toMap())
+            }
+        }
         viewModelScope.launch {
             repository.getAllRecipes().collectLatest {
                 recipeBook = it
             }
         }
+
     }
 
 
     // Handles the click event for the generate button
     fun onGenerateButtonClicked(
-        input: String, navController: NavController
+        input: String,
+        requirements: List<String>,
+        navController: NavController
     ) = viewModelScope.launch {
             recipeState.input = input
 
             // Wait until recipe is ready then navigate automatically
-            getRecipe(input).join()
+            getRecipe(input, requirements).join()
 
             navController.navigate(Destination.Recipe.route)
             currentScreen = Destination.Recipe
@@ -61,14 +78,17 @@ class MainViewModel @Inject constructor(
     }
 
     // Asynchronously launch the AI service to start generating recipe and update the value to recipeState
-    private fun getRecipe(ingredients: String) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getRecipe(ingredients: String, requirements: List<String>) = viewModelScope.launch(Dispatchers.IO) {
         // Change recipeState status to GENERATING
         recipeState = recipeState.copy(
             status = RecipeStatus.GENERATING
         )
 
         // Start to generate recipe and assign it to recipeState
-        generateRecipe(ingredients)?.let {
+        generateRecipe(
+            ingredients = ingredients,
+            features = requirements
+        )?.let {
             recipeState.recipe = it
             repository.insertRecipe(it) // Insert to book for testing only
         }

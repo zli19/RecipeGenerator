@@ -11,8 +11,8 @@ interface APIService{
 
     @Headers("Authorization: ${BuildConfig.PEXELS_API_KEY}")
     @GET("search")
-    fun getRecipePictures(
+    fun getRecipePicture(
         @Query("query") name: String,
-        @Query("per_page") number: Int = 3
+        @Query("per_page") number: Int = 1
     ): Call<PixelsData>
 }

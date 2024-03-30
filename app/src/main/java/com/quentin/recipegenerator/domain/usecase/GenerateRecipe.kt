@@ -23,19 +23,20 @@ class GenerateRecipe @Inject constructor(
 //    private var recipe: Recipe? = null
 
     // Use AIService to generate recipe and then get pictures for the recipe
-    suspend operator fun invoke(vararg ingredients: String): Recipe? {
+    suspend operator fun invoke(ingredients: String? = null, features: List<String> = emptyList()): Recipe? {
         return withContext(Dispatchers.IO) {
-            val recipe = if (ingredients.isEmpty()) {
+            val recipe = if (ingredients == null) {
                 async {
                     aiService.regenerateRecipe()
                 }.await()
             } else {
                 async {
-                    aiService.generateRecipe(ingredients[0])
+                    aiService.generateRecipe(ingredients, features)
                 }.await()
             }
             recipe?.let {
-                it.pictures = pictureService.fetchPictures(it.name)
+                it.features = features
+                it.picture = pictureService.fetchPicture(it.prompt)
             }
             return@withContext recipe
         }

@@ -20,28 +20,37 @@ class RecipeAIService(private val openAI: OpenAI): AIService {
         chatMessage {
             role = ChatRole.System
             content = """
-                You are a helpful assistant that generate recipe based on provided ingredients.
+                You are a helpful assistant that generate recipe based on provided ingredients and requirements.
                 Provide your answer in JSON structure like this: $recipeSchema
             """.trimIndent()
         },
-        chatMessage {
-            role = ChatRole.User
-            content = userMessageSample
-        },
-        chatMessage {
-            role = ChatRole.Assistant
-            content = assistantMessageSample
-        }
+//        chatMessage {
+//            role = ChatRole.User
+//            content = userMessageSample
+//        },
+//        chatMessage {
+//            role = ChatRole.Assistant
+//            content = assistantMessageSample
+//        }
     )
 
     private var chatMessages = mutableListOf<ChatMessage>()
     private val modelId = ModelId("gpt-3.5-turbo-1106")
-    override suspend fun generateRecipe(ingredients: String): Recipe? {
+    override suspend fun generateRecipe(ingredients: String, features: List<String>): Recipe? {
         // Initialize chatMessage list
         chatMessages.clear()
         chatMessages.addAll(initialMessages)
         // Add user message of the ingredients to OpenAI chatMessages
-        addUserMessage(ingredients)
+        val builder = StringBuilder()
+            .append("Ingredients: $ingredients")
+        if(features.isNotEmpty()){
+            builder.append("\nFeatures: ")
+            features.forEach{
+                builder.append("$it, ")
+            }
+        }
+
+        addUserMessage(builder.toString())
         return generate()
     }
 
@@ -54,6 +63,7 @@ class RecipeAIService(private val openAI: OpenAI): AIService {
     private fun addUserMessage(
         // Default message for regeneration
         message: String = "Generate a new recipe with the same ingredients above."
+
     ){
         val chatMessage = ChatMessage(
             role = ChatRole.User,
