@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
+// Converts base64 string to Bitmap
 @OptIn(ExperimentalEncodingApi::class)
 fun converterStringToBitmap(encodedString: String): Bitmap? {
     return try {

@@ -45,23 +45,8 @@ import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
 
 @Composable
 fun RecipeScreen(mainViewModel: MainViewModel){
-//    val recipeState = mainViewModel.recipeState.collectAsState()
-//    val recipe = recipeState.value.recipe
-    val recipe = mainViewModel.recipeState.recipe
-//    var picturePointer by remember {
-//        mutableIntStateOf(0)
-//    }
 
-//    fun next(){
-//        mainViewModel.recipeState.recipe?.pictures?.apply {
-//            if(this.size <= 1) return
-//            if(picturePointer < this.size - 1){
-//                picturePointer += 1
-//            }else{
-//                picturePointer = 0
-//            }
-//        }
-//    }
+    val recipe = mainViewModel.recipeState.recipe
 
     if(recipe != null){
         Column(

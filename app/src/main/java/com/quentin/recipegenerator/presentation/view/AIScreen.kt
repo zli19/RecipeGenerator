@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -35,7 +37,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -61,21 +62,26 @@ fun AIScreen(
     mainViewModel: MainViewModel,
 ){
 
+    // Local variable to store requirements TextField value
     var requirements by remember {
-        mutableStateOf(mainViewModel.recipeState.input)
+        mutableStateOf(mainViewModel.recipeState.requirements)
     }
 
+    // Local variable to store preference TextField value
     var preference by remember {
         mutableStateOf("")
     }
 
+    // Local variable to store values of selected preference tags
     val preferences = remember{
         mutableStateListOf<String>()
     }
 
-//    val features = mainViewModel.featureMap.keys.toMutableStateList()
 
-    Column {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+    ) {
         Spacer(modifier = Modifier.height(20.dp))
         Text(
             color = Stroke,
@@ -87,43 +93,32 @@ fun AIScreen(
                 .padding(horizontal = 10.dp)
         )
 
+        OutlinedTextField(
+            value = requirements,
+            textStyle = TextStyle(fontSize = TextUnit(20f, TextUnitType.Sp), color = Secondary),
+            onValueChange = { requirements = it },
+            modifier = Modifier
+                .height(150.dp)
+                .fillMaxWidth()
+                .padding(all = 10.dp)
+                .border(
+                    border = BorderStroke(2.dp, Secondary),
+                    shape = RoundedCornerShape(CornerSize(5.dp))
+                )
+                .background(Background, RoundedCornerShape(5.dp)),
+            placeholder = {
+                Text(
+                    text = "Such as ingredients, meal type, cooking method, occasion, etc.",
+                    color = Primary
+                )
+            }
+        )
 
-//        Box(
-//            modifier= Modifier
-//                .fillMaxWidth()
-//                .padding(horizontal = 10.dp)
-//                .border(
-//                    border = BorderStroke(2.dp, Stroke),
-//                    shape = RoundedCornerShape(CornerSize(5.dp))
-//                )
-//                .background(Background, RoundedCornerShape(5.dp))
-//        ){
-            OutlinedTextField(
-                value = requirements,
-                textStyle = TextStyle(fontSize = TextUnit(20f, TextUnitType.Sp), color = Secondary),
-                onValueChange = { requirements = it },
-                modifier = Modifier
-                    .height(150.dp)
-                    .fillMaxWidth()
-                    .padding(all = 10.dp)
-                    .border(
-                        border = BorderStroke(2.dp, Stroke),
-                        shape = RoundedCornerShape(CornerSize(5.dp))
-                    )
-                    .background(Background, RoundedCornerShape(5.dp)),
-                placeholder = {
-                    Text(
-                        text = "Such as ingredients, meal type, cooking method, occasion, etc.",
-                        color = Primary
-                    )
-                }
-            )
-//        }
         Button(
             shape = RoundedCornerShape(corner = CornerSize(5.dp)),
             onClick = {
                 if(requirements.trim().isEmpty()) return@Button
-                mainViewModel.onGenerateButtonClicked(requirements, preferences, navController)
+                mainViewModel.handleGenerateButtonClickEvent(requirements.trim(), preferences, navController)
             },
             colors = ButtonDefaults.buttonColors(containerColor = ButtonOrHighlight),
             modifier = Modifier
@@ -163,7 +158,8 @@ fun AIScreen(
             )
             IconButton(
                 onClick = {
-                    preferences.add(preference)
+                    if(preference.trim().isEmpty()) return@IconButton
+                    preferences.add(preference.trim())
                     mainViewModel.featureMap.putIfAbsent(preference, 1)
                     preference = ""
                 },
@@ -190,7 +186,7 @@ fun AIScreen(
             mainViewModel.featureMap.forEach{
                 FilterChip(
                     modifier = Modifier
-                        .padding(2.dp),
+                        .padding(5.dp),
                     selected = preferences.contains(it.key),
                     onClick = {
                         if(preferences.contains(it.key)){

@@ -1,6 +1,5 @@
 package com.quentin.recipegenerator.presentation.viewmodel
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,21 +54,22 @@ class MainViewModel @Inject constructor(
 
 
     // Handles the click event for the generate button
-    fun onGenerateButtonClicked(
-        input: String,
-        requirements: List<String>,
+    fun handleGenerateButtonClickEvent(
+        requirements: String,
+        preferences: List<String>,
         navController: NavController
     ) = viewModelScope.launch {
-            recipeState.input = input
+            recipeState.requirements = requirements
 
             // Wait until recipe is ready then navigate automatically
-            getRecipe(input, requirements).join()
+            getRecipe(requirements, preferences).join()
 
             navController.navigate(Destination.Recipe.route)
             currentScreen = Destination.Recipe
     }
 
-    fun getRecipeFromBook(recipe: Recipe, navController: NavController){
+    // Handles the click event for the recipe card
+    fun handleRecipeCardClickEvent(recipe: Recipe, navController: NavController){
         recipeState.recipe = recipe
         recipeState.status = RecipeStatus.READY
 
@@ -78,7 +78,7 @@ class MainViewModel @Inject constructor(
     }
 
     // Asynchronously launch the AI service to start generating recipe and update the value to recipeState
-    private fun getRecipe(ingredients: String, requirements: List<String>) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getRecipe(requirements: String, preferences: List<String>) = viewModelScope.launch(Dispatchers.IO) {
         // Change recipeState status to GENERATING
         recipeState = recipeState.copy(
             status = RecipeStatus.GENERATING
@@ -86,8 +86,8 @@ class MainViewModel @Inject constructor(
 
         // Start to generate recipe and assign it to recipeState
         generateRecipe(
-            ingredients = ingredients,
-            features = requirements
+            requirements = requirements,
+            preferences = preferences
         )?.let {
             recipeState.recipe = it
             repository.insertRecipe(it) // Insert to book for testing only

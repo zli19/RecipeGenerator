@@ -11,8 +11,6 @@ import com.aallam.openai.client.OpenAI
 import com.quentin.recipegenerator.domain.model.Recipe
 import com.quentin.recipegenerator.domain.service.AIService
 import kotlinx.serialization.json.Json
-import javax.inject.Inject
-import javax.inject.Singleton
 
 class RecipeAIService(private val openAI: OpenAI): AIService {
 
@@ -20,7 +18,7 @@ class RecipeAIService(private val openAI: OpenAI): AIService {
         chatMessage {
             role = ChatRole.System
             content = """
-                You are a helpful assistant that generate recipe based on provided ingredients and requirements.
+                You are a helpful assistant that generate recipe based on user-provided requirements and preferences.
                 Provide your answer in JSON structure like this: $recipeSchema
             """.trimIndent()
         },
@@ -36,16 +34,16 @@ class RecipeAIService(private val openAI: OpenAI): AIService {
 
     private var chatMessages = mutableListOf<ChatMessage>()
     private val modelId = ModelId("gpt-3.5-turbo-1106")
-    override suspend fun generateRecipe(ingredients: String, features: List<String>): Recipe? {
+    override suspend fun generateRecipe(requirements: String, preferences: List<String>): Recipe? {
         // Initialize chatMessage list
         chatMessages.clear()
         chatMessages.addAll(initialMessages)
         // Add user message of the ingredients to OpenAI chatMessages
         val builder = StringBuilder()
-            .append("Ingredients: $ingredients")
-        if(features.isNotEmpty()){
-            builder.append("\nFeatures: ")
-            features.forEach{
+            .append("Requirements: $requirements")
+        if(preferences.isNotEmpty()){
+            builder.append("\nPreferences: ")
+            preferences.forEach{
                 builder.append("$it, ")
             }
         }
