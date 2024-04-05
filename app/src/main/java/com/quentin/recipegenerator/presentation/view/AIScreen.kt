@@ -50,6 +50,7 @@ import com.quentin.recipegenerator.R
 import com.quentin.recipegenerator.presentation.viewmodel.RecipeStatus
 import com.quentin.recipegenerator.presentation.ui.theme.Background
 import com.quentin.recipegenerator.presentation.ui.theme.ButtonOrHighlight
+import com.quentin.recipegenerator.presentation.ui.theme.Headline
 import com.quentin.recipegenerator.presentation.ui.theme.Primary
 import com.quentin.recipegenerator.presentation.ui.theme.Secondary
 import com.quentin.recipegenerator.presentation.ui.theme.Stroke
@@ -109,7 +110,7 @@ fun AIScreen(
             placeholder = {
                 Text(
                     text = "Such as ingredients, meal type, cooking method, occasion, etc.",
-                    color = Primary
+                    color = Headline
                 )
             }
         )
@@ -159,7 +160,7 @@ fun AIScreen(
             IconButton(
                 onClick = {
                     if(preference.trim().isEmpty()) return@IconButton
-                    preferences.add(preference.trim())
+                    preferences.add(preference.trim().lowercase())
                     mainViewModel.featureMap.putIfAbsent(preference, 1)
                     preference = ""
                 },
@@ -212,7 +213,7 @@ fun AIScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Delete tag",
+                                contentDescription = "Delete ${it.key}",
                                 tint = Stroke
                             )
                         }

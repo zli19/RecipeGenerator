@@ -7,7 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
 
-interface APIService{
+interface PixelsAPIService{
 
     @Headers("Authorization: ${BuildConfig.PEXELS_API_KEY}")
     @GET("search")

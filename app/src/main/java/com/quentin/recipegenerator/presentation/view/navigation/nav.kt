@@ -44,7 +44,7 @@ fun RecipeScaffold(
                     BookScreen(navController, mainViewModel)
                 }
                 composable(Destination.Recipe.route) {
-                    RecipeScreen(mainViewModel)
+                    RecipeScreen(navController, mainViewModel)
                 }
             }
         }

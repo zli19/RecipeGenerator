@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.quentin.recipegenerator.R
 import com.quentin.recipegenerator.presentation.ui.theme.Primary
@@ -31,7 +32,7 @@ import com.quentin.recipegenerator.presentation.ui.theme.Stroke
 import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
 
 @Composable
-fun RecipeScreen(mainViewModel: MainViewModel){
+fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
 
     val recipe = mainViewModel.recipeState.recipe
 
@@ -40,25 +41,12 @@ fun RecipeScreen(mainViewModel: MainViewModel){
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
         ) {
-            recipe.picture?.apply {
-                if (this.startsWith("http")) {
-                    AsyncImage(
-                        model = recipe.picture,
-                        contentDescription = recipe.name,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-                } else {
-                    val model = converterStringToBitmap(this)
-                    AsyncImage(
-                        model = model,
-                        contentDescription = recipe.name,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-                }
-            }
-
+            AsyncImage(
+                model = recipe.picture,
+                contentDescription = "Image of ${recipe.name}",
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
 
             Row(
                 modifier = Modifier
@@ -79,7 +67,7 @@ fun RecipeScreen(mainViewModel: MainViewModel){
                     modifier = Modifier
                         .fillMaxHeight(0.4F)
                 ) {
-                    Image(painter = painterResource(id = R.drawable.icons8_like_regular_50), contentDescription = "regenerate")
+                    Image(painter = painterResource(id = R.drawable.icons8_like_regular_50), contentDescription = "add to book")
                 }
             }
             Divider(
@@ -102,7 +90,9 @@ fun RecipeScreen(mainViewModel: MainViewModel){
                     textAlign = TextAlign.Start
                 )
                 IconButton(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        mainViewModel.handleRegenerateButtonClickEvent(navController)
+                    },
                     modifier = Modifier
                         .fillMaxHeight(0.4F)
                 ) {

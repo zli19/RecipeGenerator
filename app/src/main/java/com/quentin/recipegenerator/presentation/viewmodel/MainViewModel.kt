@@ -17,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-//@SuppressLint("MutableCollectionMutableState")
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: RecipeRepository,
@@ -44,12 +43,6 @@ class MainViewModel @Inject constructor(
                 featureMap.putAll(map.toList().sortedBy { -it.second }.toMap())
             }
         }
-        viewModelScope.launch {
-            repository.getAllRecipes().collectLatest {
-                recipeBook = it
-            }
-        }
-
     }
 
 
@@ -60,6 +53,7 @@ class MainViewModel @Inject constructor(
         navController: NavController
     ) = viewModelScope.launch {
             recipeState.requirements = requirements
+            recipeState.preferences = preferences
 
             // Wait until recipe is ready then navigate automatically
             getRecipe(requirements, preferences).join()
@@ -77,18 +71,35 @@ class MainViewModel @Inject constructor(
         currentScreen = Destination.Recipe
     }
 
+    // Handles the click event for the regenerate button
+    fun handleRegenerateButtonClickEvent(
+        navController: NavController
+    ) = viewModelScope.launch {
+
+        // Wait until recipe is ready then navigate automatically
+        getRecipe().join()
+
+        navController.navigate(Destination.Recipe.route)
+        currentScreen = Destination.Recipe
+    }
+
     // Asynchronously launch the AI service to start generating recipe and update the value to recipeState
-    private fun getRecipe(requirements: String, preferences: List<String>) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getRecipe(requirements: String? = null, preferences: List<String> = emptyList()) = viewModelScope.launch(Dispatchers.IO) {
         // Change recipeState status to GENERATING
         recipeState = recipeState.copy(
             status = RecipeStatus.GENERATING
         )
 
-        // Start to generate recipe and assign it to recipeState
-        generateRecipe(
-            requirements = requirements,
-            preferences = preferences
-        )?.let {
+        if(requirements == null){
+            // Start to regenerate recipe and assign it to recipeState
+            generateRecipe()
+        }else{
+            // Start to generate recipe and assign it to recipeState
+            generateRecipe(
+                requirements = requirements,
+                preferences = preferences
+            )
+        }?.let {
             recipeState.recipe = it
             repository.insertRecipe(it) // Insert to book for testing only
         }

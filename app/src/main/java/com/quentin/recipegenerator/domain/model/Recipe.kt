@@ -19,5 +19,5 @@ data class Recipe(
     val prompt: String,
     var picture: String? = null,
     var features: List<String> = emptyList(),
-    var time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+    var time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
 )

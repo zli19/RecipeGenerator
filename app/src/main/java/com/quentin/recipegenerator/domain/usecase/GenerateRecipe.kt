@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
+// Represent the use case of recipe generation
 @Singleton
 class GenerateRecipe @Inject constructor(
     private val aiService: AIService,

@@ -52,6 +52,7 @@ import com.quentin.recipegenerator.R
 import com.quentin.recipegenerator.presentation.ui.theme.ButtonOrHighlight
 import com.quentin.recipegenerator.presentation.ui.theme.Headline
 import com.quentin.recipegenerator.presentation.ui.theme.Secondary
+import com.quentin.recipegenerator.presentation.ui.theme.Stroke
 import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,9 +61,8 @@ fun TopNav(
     mainViewModel: MainViewModel
 ){
     var openDialog by remember { mutableStateOf(false) }
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Secondary,
@@ -95,11 +95,11 @@ fun TopNav(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = ButtonOrHighlight)
                 ) {
-                    Text(text = "Login", fontSize = TextUnit(16f, TextUnitType.Sp), color = Headline )
+                    Text(text = "Login ", fontSize = TextUnit(16f, TextUnitType.Sp), color = Stroke )
                     Icon(
                         imageVector = Icons.Filled.AccountCircle,
                         contentDescription = "Account",
-                        tint = Headline
+                        tint = Stroke
                     )
                 }
             }else{
@@ -123,72 +123,11 @@ fun TopNav(
         scrollBehavior = scrollBehavior,
     )
     if (openDialog) {
-        AlertDialog(
-            modifier = Modifier.size(
-                width = 300.dp,
-                height = 300.dp
-            ),
+        LoginDialog(
             onDismissRequest = {
-                // Dismiss the dialog when the user clicks outside the dialog or on the back
-                // button. If you want to disable that functionality, simply use an empty
-                // onDismissRequest.
                 openDialog = false
-            }
-        ){
-            Surface(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight(),
-                shape = MaterialTheme.shapes.large
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-
-                    //... AlertDialog content
-                    Text(
-                        text = "Login",
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = TextUnit(18f, TextUnitType.Sp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(all = 10.dp)
-                    )
-                    Text(text = "Username")
-                    TextField(
-                        value = username,
-                        textStyle = TextStyle(fontSize = TextUnit(20f, TextUnitType.Sp), color = Secondary),
-                        onValueChange = { username = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(all = 10.dp)
-                    )
-                    Text(text = "password")
-                    TextField(
-                        value = password,
-                        textStyle = TextStyle(fontSize = TextUnit(20f, TextUnitType.Sp), color = Secondary),
-                        onValueChange = { password = it },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(all = 10.dp),
-                        visualTransformation = PasswordVisualTransformation()
-                    )
-                    Row {
-                        TextButton(onClick = { openDialog = false }) {
-                            Text("Cancel")
-                        }
-                        TextButton(onClick = {
-                            openDialog = false
-                            mainViewModel.user = username
-                        }) {
-                            Text("Sign in")
-                        }
-                    }
-                }
-            }
-
-        }
+            },
+            mainViewModel
+        )
     }
 }
