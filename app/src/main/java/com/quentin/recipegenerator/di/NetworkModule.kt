@@ -1,8 +1,6 @@
 package com.quentin.recipegenerator.di
 
 import android.content.Context
-import com.quentin.recipegenerator.data.api.pixelsapi.PixelsAPIService
-import com.quentin.recipegenerator.data.api.pixelsapi.PixelsPictureService
 import com.quentin.recipegenerator.data.api.stabilityai.StabilityAIPictureService
 import com.quentin.recipegenerator.data.api.stabilityai.StabilityAPIService
 import com.quentin.recipegenerator.domain.service.PictureService

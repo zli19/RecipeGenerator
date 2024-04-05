@@ -1,10 +1,8 @@
 package com.quentin.recipegenerator.data.api.stabilityai
 
 import android.content.Context
-import android.os.Build
 import android.util.Base64
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.quentin.openai_api_demo.model.ReqBody
 import com.quentin.openai_api_demo.model.TextPrompt
 import com.quentin.recipegenerator.domain.service.PictureService
@@ -45,9 +43,9 @@ class StabilityAIPictureService(
                 val decodedString: ByteArray = Base64.decode(data, Base64.DEFAULT)
                 val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
                 fos = context.openFileOutput("$time.png", Context.MODE_PRIVATE)
-                fos?.write(decodedString);
-                fos?.flush();
-                fos?.close();
+                fos?.write(decodedString)
+                fos?.flush()
+                fos?.close()
                 returnValue = "${context.filesDir}${File.separator}$time.png"
                 Log.i("writeToFile", returnValue)
             }
@@ -55,7 +53,7 @@ class StabilityAIPictureService(
             Log.e("writeToFile", e.toString())
         }finally {
             if (fos != null) {
-                fos = null;
+                fos = null
             }
         }
         return  returnValue
