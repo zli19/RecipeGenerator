@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -36,19 +35,15 @@ import com.quentin.recipegenerator.presentation.ui.theme.Background
 import com.quentin.recipegenerator.presentation.ui.theme.ButtonOrHighlight
 import com.quentin.recipegenerator.presentation.ui.theme.Headline
 import com.quentin.recipegenerator.presentation.ui.theme.Secondary
+import com.quentin.recipegenerator.presentation.ui.theme.Stroke
 import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel){
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     Dialog(
-//        modifier = Modifier.size(
-//            width = 300.dp,
-//            height = 300.dp
-//        ),
         // Dismiss the dialog when the user clicks outside the dialog or on the back
         // button. If you want to disable that functionality, simply use an empty
         // onDismissRequest.
@@ -64,7 +59,6 @@ fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel){
                 modifier = Modifier
                     .background(Secondary, RoundedCornerShape(10.dp))
                     .padding(16.dp)
-
             ) {
 
                 //... AlertDialog content
@@ -123,7 +117,7 @@ fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel){
                         onDismissRequest()
                         mainViewModel.user = username
                     }) {
-                        Text("Sign in")
+                        Text("Sign in", color = Stroke)
                     }
                 }
             }
