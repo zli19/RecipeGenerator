@@ -4,9 +4,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
@@ -15,6 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -29,14 +32,16 @@ import com.quentin.recipegenerator.R
 import com.quentin.recipegenerator.presentation.ui.theme.Primary
 import com.quentin.recipegenerator.presentation.ui.theme.Secondary
 import com.quentin.recipegenerator.presentation.ui.theme.Stroke
+import com.quentin.recipegenerator.presentation.ui.theme.Tertiary
 import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
+import com.quentin.recipegenerator.presentation.viewmodel.RecipeStatus
 
 @Composable
 fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
 
     val recipe = mainViewModel.recipeState.recipe
 
-    if(recipe != null){
+    if(recipe.name.isNotBlank()){
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
@@ -51,6 +56,8 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = recipe.name,
@@ -58,16 +65,33 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
                         .padding(10.dp)
                         .weight(1f),
                     color = Stroke,
+                    lineHeight = TextUnit(32f, TextUnitType.Sp),
                     fontWeight = FontWeight.Bold,
                     fontSize = TextUnit(30f, TextUnitType.Sp),
                     textAlign = TextAlign.Center
                 )
-                IconButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .fillMaxHeight(0.4F)
-                ) {
-                    Image(painter = painterResource(id = R.drawable.icons8_like_regular_50), contentDescription = "add to book")
+                if (recipe.id == 0L){
+                    IconButton(
+                        onClick = {
+                            mainViewModel.onLikeButtonClicked()
+                        }
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.icons8_like_regular_100),
+                            contentDescription = "add to book"
+                        )
+                    }
+                }else{
+                    IconButton(
+                        onClick = {
+                            mainViewModel.onUnlikeButtonClicked()
+                        }
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.icons8_like_red_100),
+                            contentDescription = "add to book"
+                        )
+                    }
                 }
             }
             Divider(
@@ -78,6 +102,8 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = recipe.info,
@@ -89,14 +115,16 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
                     fontSize = TextUnit(16f, TextUnitType.Sp),
                     textAlign = TextAlign.Start
                 )
+
                 IconButton(
                     onClick = {
-                        mainViewModel.handleRegenerateButtonClickEvent(navController)
+                        mainViewModel.onGenerateButtonClicked(navController = navController)
                     },
                     modifier = Modifier
-                        .fillMaxHeight(0.4F)
+                        .fillMaxHeight(0.4F),
+                    enabled = mainViewModel.recipeState.status != RecipeStatus.GENERATING
                 ) {
-                    Image(painter = painterResource(id = R.drawable.icons8_reset_50), contentDescription = "regenerate")
+                    Image(painter = painterResource(id = R.drawable.icons8_reset_100), contentDescription = "regenerate")
                 }
             }
 
@@ -187,6 +215,27 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
             )
         }
     }else{
-        Text(text = "No recipe is on display.")
+        Column {
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "No recipe is on display...",
+                fontWeight = FontWeight.Bold,
+                fontSize = TextUnit(26f, TextUnitType.Sp),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+            )
+            Text(
+                text = "Generate or choose a recipe first!",
+                fontWeight = FontWeight.Bold,
+                color = Tertiary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+            )
+            Spacer(modifier = Modifier.weight(1f))
+        }
     }
 }

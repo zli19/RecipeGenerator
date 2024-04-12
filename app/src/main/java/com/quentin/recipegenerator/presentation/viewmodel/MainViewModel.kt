@@ -29,7 +29,7 @@ class MainViewModel @Inject constructor(
     var recipeState by mutableStateOf(RecipeState())
 
     var recipeBook by mutableStateOf<List<Recipe>>(emptyList())
-    var featureMap = mutableStateMapOf<String, Int>()
+    var preferenceMap = mutableStateMapOf<String, Int>()
 
     init {
         // Retrieve data from database
@@ -37,71 +37,115 @@ class MainViewModel @Inject constructor(
             repository.getAllRecipes().collectLatest { recipes ->
                 recipeBook = recipes
                 val map = HashMap<String, Int>()
-                for (feature in recipeBook.flatMap { it.features }) {
-                    map[feature] = map.getOrDefault(feature, 0) + 1
+                for (preference in recipeBook.flatMap { it.preferences }) {
+                    map[preference] = map.getOrDefault(preference, 0) + 1
                 }
-                featureMap.putAll(map.toList().sortedBy { -it.second }.toMap())
+                preferenceMap.putAll(map.toList().sortedBy { -it.second }.toMap())
             }
         }
     }
 
 
-    // Handles the click event for the generate button
-    fun handleGenerateButtonClickEvent(
-        requirements: String,
-        preferences: List<String>,
+    // Handles the click event for the generate and regenerate button.
+    fun onGenerateButtonClicked(
+        requirements: String = "",
+        preferences: List<String> = emptyList(),
         navController: NavController
     ) = viewModelScope.launch {
-            recipeState.requirements = requirements
-            recipeState.preferences = preferences
 
-            // Wait until recipe is ready then navigate automatically
-            getRecipe(requirements, preferences).join()
+        if(requirements.isNotBlank()){
+            // When requirements is not blank, it is new round of recipe generation.
+            // Clear history.
+            recipeState.history.clear()
 
-            navController.navigate(Destination.Recipe.route)
-            currentScreen = Destination.Recipe
+            getRecipe(requirements, preferences)
+                .join()
+        }else{
+            // else it is a regeneration request. Using the same requirements and preferences.
+            recipeState.recipe?.apply {
+                getRecipe(
+                    this.requirements,
+                    this.preferences,
+                    recipeState.history
+                )
+            }
+        }
+
+        // Wait until recipe is ready then navigate automatically
+        navController.navigate(Destination.Recipe.route)
+        currentScreen = Destination.Recipe
     }
 
+//    // Handles the click event for the regenerate button
+//    fun onRegenerateButtonClicked(
+//        navController: NavController
+//    ) = viewModelScope.launch {
+//
+//        // Wait until recipe is ready then navigate automatically
+////        getRecipe().join()
+//
+//        navController.navigate(Destination.Recipe.route)
+//        currentScreen = Destination.Recipe
+//    }
+
     // Handles the click event for the recipe card
-    fun handleRecipeCardClickEvent(recipe: Recipe, navController: NavController){
+    fun onRecipeCardClicked(recipe: Recipe, navController: NavController){
         recipeState.recipe = recipe
         recipeState.status = RecipeStatus.READY
 
+        // Clear history and add the current recipe name to history.
+        recipeState.history.clear()
+        recipeState.history.add(recipe.name)
+
         navController.navigate(Destination.Recipe.route)
         currentScreen = Destination.Recipe
     }
 
-    // Handles the click event for the regenerate button
-    fun handleRegenerateButtonClickEvent(
-        navController: NavController
-    ) = viewModelScope.launch {
+    // Insert recipe into book
+    fun onLikeButtonClicked() = viewModelScope.launch {
+        recipeState.recipe?.apply {
+            val id = repository.insertRecipe(this)
+            repository.getRecipeById(id).apply {
+                recipeState = recipeState.copy(
+                    recipe = this
+                )
+            }
+        }
+    }
 
-        // Wait until recipe is ready then navigate automatically
-        getRecipe().join()
-
-        navController.navigate(Destination.Recipe.route)
-        currentScreen = Destination.Recipe
+    // Delete recipe from book
+    fun onUnlikeButtonClicked()= viewModelScope.launch{
+        recipeState.recipe?.apply {
+            repository.deleteRecipe(this)
+            val recipe = this.copy(id = 0L)
+            recipeState = recipeState.copy(
+                recipe = recipe
+            )
+        }
     }
 
     // Asynchronously launch the AI service to start generating recipe and update the value to recipeState
-    private fun getRecipe(requirements: String? = null, preferences: List<String> = emptyList()) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getRecipe(
+        requirements: String,
+        preferences: List<String>,
+        exclusions: List<String> = emptyList()
+    ) = viewModelScope.launch(Dispatchers.IO) {
+
         // Change recipeState status to GENERATING
         recipeState = recipeState.copy(
             status = RecipeStatus.GENERATING
         )
 
-        if(requirements == null){
-            // Start to regenerate recipe and assign it to recipeState
-            generateRecipe()
-        }else{
-            // Start to generate recipe and assign it to recipeState
-            generateRecipe(
-                requirements = requirements,
-                preferences = preferences
-            )
-        }?.let {
+        // Start to generate recipe and assign it to recipeState
+        generateRecipe(
+            requirements = requirements,
+            preferences = preferences,
+            exclusions = exclusions
+        )?.let {
+            // Update the recipe stored in recipeState to be the newly generated one.
             recipeState.recipe = it
-            repository.insertRecipe(it) // Insert to book for testing only
+            // Add its name to history for potential regeneration.
+            recipeState.history.add(it.name)
         }
 
         // Change recipeState status to READY

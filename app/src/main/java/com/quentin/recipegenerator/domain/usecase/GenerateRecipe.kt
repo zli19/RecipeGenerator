@@ -15,24 +15,22 @@ class GenerateRecipe @Inject constructor(
     private val aiService: AIService,
     private val pictureService: PictureService,
 ) {
-
     // Use AIService to generate recipe and then get pictures for the recipe
-    suspend operator fun invoke(requirements: String? = null, preferences: List<String> = emptyList()): Recipe? {
+    suspend operator fun invoke(
+        requirements: String,
+        preferences: List<String>,
+        exclusions: List<String>
+    ): Recipe? {
         return withContext(Dispatchers.IO) {
-            val recipe = if (requirements == null) {
-                // Wait until use the same cached requirements and preferences to regenerate a different recipe,
-                async {
-                    aiService.regenerateRecipe()
-                }.await()
-            } else {
-                // Wait until generate a recipe with requirements and preferences from user input.
-                async {
-                    aiService.generateRecipe(requirements, preferences)
-                }.await()
-            }
+            // Wait until generate a recipe with requirements and preferences from user input.
+            val recipe = async {
+                aiService.generateRecipe(requirements, preferences, exclusions)
+            }.await()
+
             // Synchronously assign features and picture to generated recipe object.
             recipe?.let {
-                it.features = preferences
+                it.preferences = preferences
+                it.requirements = requirements
                 it.picture = pictureService.fetchPicture(it.prompt)
             }
             return@withContext recipe

@@ -16,7 +16,7 @@ class PixelsPictureService(
                 pixelsApiService.getRecipePicture(prompt)
             }
             return@withContext response.await().awaitResponse<PixelsData>()
-                .body()?.photos?.get(0)?.src?.landscape
+                .body()?.photos?.get(0)?.src?.original
         }
     }
 }

@@ -34,7 +34,7 @@ class RecipeAIService(private val openAI: OpenAI): AIService {
 
     private var chatMessages = mutableListOf<ChatMessage>()
     private val modelId = ModelId("gpt-3.5-turbo-1106")
-    override suspend fun generateRecipe(requirements: String, preferences: List<String>): Recipe? {
+    override suspend fun generateRecipe(requirements: String, preferences: List<String>, exclusions: List<String>): Recipe? {
         // Initialize chatMessage list
         chatMessages.clear()
         chatMessages.addAll(initialMessages)
@@ -47,22 +47,20 @@ class RecipeAIService(private val openAI: OpenAI): AIService {
                 builder.append("$it, ")
             }
         }
+        if(exclusions.isNotEmpty()){
+            builder.append("\nExclusions: ")
+            exclusions.forEach{
+                builder.append("$it, ")
+            }
+        }
 
-        addUserMessage(builder.toString())
+        val message = builder.toString()
+        Log.i("userMessage", message)
+        addUserMessage(message)
         return generate()
     }
 
-    override suspend fun regenerateRecipe(): Recipe? {
-        // Add default message for regeneration
-        addUserMessage()
-        return generate()
-    }
-
-    private fun addUserMessage(
-        // Default message for regeneration
-        message: String = "Generate a new recipe with the same ingredients above."
-
-    ){
+    private fun addUserMessage( message: String ){
         val chatMessage = ChatMessage(
             role = ChatRole.User,
             content = message
@@ -90,12 +88,12 @@ class RecipeAIService(private val openAI: OpenAI): AIService {
         }else{
 
             // Add newly generated recipe result to chatMessages for potential future regeneration
-            chatMessages.add(
-                ChatMessage(
-                    role = ChatRole.Assistant,
-                    content = content
-                )
-            )
+//            chatMessages.add(
+//                ChatMessage(
+//                    role = ChatRole.Assistant,
+//                    content = content
+//                )
+//            )
 
             Log.i("zhikun", content) //for testing
 

@@ -5,9 +5,7 @@ import com.quentin.recipegenerator.data.db.roomdb.RecipeDao
 import com.quentin.recipegenerator.data.db.roomdb.RecipeDatabase
 import com.quentin.recipegenerator.domain.model.Recipe
 import com.quentin.recipegenerator.domain.repository.RecipeRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Singleton
 
 class RoomRecipeRepo(context: Context) : RecipeRepository {
 
@@ -17,11 +15,15 @@ class RoomRecipeRepo(context: Context) : RecipeRepository {
         return recipeDao.getRecipes()
     }
 
-    override suspend fun insertRecipe(recipe: Recipe) {
-        recipeDao.upsertRecipe(recipe)
+    override suspend fun insertRecipe(recipe: Recipe): Long {
+        return recipeDao.insertRecipe(recipe)
     }
 
     override suspend fun deleteRecipe(recipe: Recipe) {
         recipeDao.deleteRecipe(recipe)
+    }
+
+    override suspend fun getRecipeById(id: Long): Recipe {
+        return recipeDao.getRecipe(id)
     }
 }

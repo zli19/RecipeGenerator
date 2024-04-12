@@ -1,6 +1,7 @@
 package com.quentin.recipegenerator.presentation.view.component
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
@@ -9,6 +10,8 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.quentin.recipegenerator.presentation.view.navigation.Destination
 import com.quentin.recipegenerator.presentation.ui.theme.ButtonOrHighlight
 import com.quentin.recipegenerator.presentation.ui.theme.Headline
@@ -45,7 +48,7 @@ fun RowScope.AddItem(
     NavigationBarItem(
         label = {
             Text(
-                text = destination.route,
+                text = destination.route
             )
         },
 

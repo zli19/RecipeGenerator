@@ -3,9 +3,14 @@ package com.quentin.recipegenerator.presentation.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,19 +24,26 @@ import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
 @Composable
 fun BookScreen(navController: NavController, mainViewModel: MainViewModel){
 
-    val recipes = mainViewModel.recipeBook
+    // Solution1
 //    FlowRow(
-//        horizontalArrangement = Arrangement.SpaceAround,
+//        horizontalArrangement = Arrangement.Start,
 //        modifier = Modifier
 //            .fillMaxWidth()
 //            .verticalScroll(rememberScrollState())
 //    ) {
-//        // Solution1
-//        mainViewModel.recipeBook.forEach{
+//
+//        mainViewModel.recipeBook.forEach {
 //            RecipeCard(it, mainViewModel = mainViewModel, navController = navController)
 //        }
+//    }
 
-        // Solution2
+    // Solution2
+//    FlowRow(
+//        horizontalArrangement = Arrangement.Start,
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .verticalScroll(rememberScrollState())
+//    ) {
 //        RecipeColumn(
 //            recipes = mainViewModel
 //                .recipeBook
@@ -59,10 +71,12 @@ fun BookScreen(navController: NavController, mainViewModel: MainViewModel){
 //    }
 
     // Best solution
+    val recipes = mainViewModel.recipeBook
+
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         verticalItemSpacing = 4.dp,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
         content = {
             items(
                 count = recipes.size

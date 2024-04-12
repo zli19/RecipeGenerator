@@ -11,13 +11,13 @@ import java.time.format.DateTimeFormatter
 data class Recipe(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
-    val directions: String,
-    val info: String,
-    val ingredients: String,
-    val name: String,
-    val nutrition: String,
-    val prompt: String,
+    val directions: String = "",
+    val info: String = "",
+    val ingredients: String = "",
+    val name: String = "",
+    val nutrition: String = "",
+    val prompt: String = "",
     var picture: String? = null,
-    var features: List<String> = emptyList(),
-    var time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
+    var requirements: String = "",
+    var preferences: List<String> = emptyList()
 )

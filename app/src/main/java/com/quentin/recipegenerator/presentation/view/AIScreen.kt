@@ -62,10 +62,9 @@ fun AIScreen(
     navController: NavController,
     mainViewModel: MainViewModel,
 ){
-
     // Local variable to store requirements TextField value
     var requirements by remember {
-        mutableStateOf(mainViewModel.recipeState.requirements)
+        mutableStateOf(mainViewModel.recipeState.recipe.requirements)
     }
 
     // Local variable to store preference TextField value
@@ -77,7 +76,6 @@ fun AIScreen(
     val preferences = remember{
         mutableStateListOf<String>()
     }
-
 
     Column(
         modifier = Modifier
@@ -119,7 +117,7 @@ fun AIScreen(
             shape = RoundedCornerShape(corner = CornerSize(5.dp)),
             onClick = {
                 if(requirements.trim().isEmpty()) return@Button
-                mainViewModel.handleGenerateButtonClickEvent(requirements.trim(), preferences, navController)
+                mainViewModel.onGenerateButtonClicked(requirements.trim(), preferences, navController)
             },
             colors = ButtonDefaults.buttonColors(containerColor = ButtonOrHighlight),
             modifier = Modifier
@@ -161,7 +159,7 @@ fun AIScreen(
                 onClick = {
                     if(preference.trim().isEmpty()) return@IconButton
                     preferences.add(preference.trim().lowercase())
-                    mainViewModel.featureMap.putIfAbsent(preference, 1)
+                    mainViewModel.preferenceMap.putIfAbsent(preference.trim().lowercase(), 1)
                     preference = ""
                 },
                 modifier = Modifier
@@ -184,7 +182,7 @@ fun AIScreen(
         )
 
         FlowRow {
-            mainViewModel.featureMap.forEach{
+            mainViewModel.preferenceMap.forEach{
                 FilterChip(
                     modifier = Modifier
                         .padding(5.dp),
@@ -205,7 +203,7 @@ fun AIScreen(
                     trailingIcon ={
                         IconButton(
                             onClick = {
-                                mainViewModel.featureMap.remove(it.key)
+                                mainViewModel.preferenceMap.remove(it.key)
                                 preferences.remove(it.key)
                             },
                             modifier = Modifier

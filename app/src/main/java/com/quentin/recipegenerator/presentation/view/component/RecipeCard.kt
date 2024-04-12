@@ -32,10 +32,10 @@ fun RecipeCard(recipe: Recipe, mainViewModel:MainViewModel, navController: NavCo
         ),
         border = BorderStroke(2.dp, Stroke),
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(2.dp)
+            .fillMaxWidth(0.5f)
+            .padding(4.dp)
             .clickable {
-                mainViewModel.handleRecipeCardClickEvent(recipe, navController)
+                mainViewModel.onRecipeCardClicked(recipe, navController)
             }
     ) {
         AsyncImage(
