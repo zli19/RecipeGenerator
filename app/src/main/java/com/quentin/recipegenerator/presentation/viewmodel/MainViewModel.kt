@@ -62,7 +62,7 @@ class MainViewModel @Inject constructor(
                 .join()
         }else{
             // else it is a regeneration request. Using the same requirements and preferences.
-            recipeState.recipe?.apply {
+            recipeState.recipe.apply {
                 getRecipe(
                     this.requirements,
                     this.preferences,
@@ -103,7 +103,7 @@ class MainViewModel @Inject constructor(
 
     // Insert recipe into book
     fun onLikeButtonClicked() = viewModelScope.launch {
-        recipeState.recipe?.apply {
+        recipeState.recipe.apply {
             val id = repository.insertRecipe(this)
             repository.getRecipeById(id).apply {
                 recipeState = recipeState.copy(
@@ -115,7 +115,7 @@ class MainViewModel @Inject constructor(
 
     // Delete recipe from book
     fun onUnlikeButtonClicked()= viewModelScope.launch{
-        recipeState.recipe?.apply {
+        recipeState.recipe.apply {
             repository.deleteRecipe(this)
             val recipe = this.copy(id = 0L)
             recipeState = recipeState.copy(
