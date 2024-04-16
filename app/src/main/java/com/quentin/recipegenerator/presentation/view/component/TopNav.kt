@@ -1,5 +1,6 @@
 package com.quentin.recipegenerator.presentation.view.component
 
+import android.content.Context
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -23,12 +24,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 import com.quentin.recipegenerator.R
 import com.quentin.recipegenerator.presentation.ui.theme.ButtonOrHighlight
 import com.quentin.recipegenerator.presentation.ui.theme.Headline
@@ -39,7 +42,8 @@ import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopNav(
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    context: Context
 ){
     var openDialog by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -68,7 +72,7 @@ fun TopNav(
             )
         },
         actions = {
-            if(mainViewModel.user.isEmpty()){
+            if(mainViewModel.user == null){
                 Button(
                     shape = RoundedCornerShape(corner = CornerSize(5.dp)),
                     onClick = {
@@ -84,12 +88,23 @@ fun TopNav(
                     )
                 }
             }else{
-                IconButton(onClick = {
-                    mainViewModel.user = ""
-                }) {
-                    Row {
-                        Text(text = mainViewModel.user.first().toString().uppercase(), fontSize = TextUnit(18f, TextUnitType.Sp), color = Headline )
-                        Spacer(modifier = Modifier.width(2.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(
+                        text = mainViewModel
+                            .user!!
+                            .email
+                            .toString(),
+                        fontSize = TextUnit(18f, TextUnitType.Sp),
+                        color = Headline
+                    )
+
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    IconButton(
+                        onClick = { signOut(mainViewModel) }
+                    ){
                         Icon(
                             imageVector = Icons.Filled.ExitToApp,
                             contentDescription = "Account",
@@ -108,7 +123,14 @@ fun TopNav(
             onDismissRequest = {
                 openDialog = false
             },
-            mainViewModel
+            mainViewModel,
+            context
         )
     }
+}
+
+fun signOut(mainViewModel: MainViewModel){
+    val auth = FirebaseAuth.getInstance()
+    auth.signOut()
+    mainViewModel.user = null
 }

@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.quentin.recipegenerator.presentation.view.navigation.RecipeScaffold
 import com.quentin.recipegenerator.presentation.ui.theme.RecipeGeneratorTheme
 import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             RecipeGeneratorTheme {
                 val navController = rememberNavController()
-                RecipeScaffold(navController, mainViewModel)
+                RecipeScaffold(navController, mainViewModel, applicationContext)
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.quentin.recipegenerator.presentation.view.navigation
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -21,10 +22,11 @@ import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
 fun RecipeScaffold(
     navController: NavHostController,
     mainViewModel: MainViewModel,
+    context: Context
 ){
     Scaffold(
         topBar = {
-            TopNav(mainViewModel)
+            TopNav(mainViewModel, context)
         },
         bottomBar={
             BottomNav(navController = navController, mainViewModel)

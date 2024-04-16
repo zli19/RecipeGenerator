@@ -1,5 +1,8 @@
 package com.quentin.recipegenerator.presentation.view.component
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +25,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -31,6 +36,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.quentin.recipegenerator.presentation.ui.theme.Background
 import com.quentin.recipegenerator.presentation.ui.theme.ButtonOrHighlight
 import com.quentin.recipegenerator.presentation.ui.theme.Headline
@@ -39,9 +46,10 @@ import com.quentin.recipegenerator.presentation.ui.theme.Stroke
 import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
 
 @Composable
-fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel){
-    var username by remember { mutableStateOf("") }
+fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel, context: Context){
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Dialog(
         // Dismiss the dialog when the user clicks outside the dialog or on the back
@@ -74,14 +82,14 @@ fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel){
                 )
 
                 OutlinedTextField(
-                    value = username,
+                    value = email,
                     textStyle = TextStyle(fontSize = TextUnit(20f, TextUnitType.Sp), color = Headline),
-                    onValueChange = { username = it },
+                    onValueChange = { email = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(all = 10.dp),
                     label = {
-                        Text(text = "Username", color = Background)
+                        Text(text = "Email", color = Background)
                     }
                 )
 
@@ -114,9 +122,11 @@ fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel){
                             containerColor = ButtonOrHighlight
                         ),
                         onClick = {
-                        onDismissRequest()
-                        mainViewModel.user = username
-                    }) {
+                            performSignIn(email, password, context, mainViewModel)
+                            keyboardController?.hide()
+                            onDismissRequest()
+                        }
+                    ) {
                         Text("Sign in", color = Stroke)
                     }
                 }
@@ -124,4 +134,28 @@ fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel){
         }
 
     }
+}
+
+fun performSignIn(
+    email: String,
+    password: String,
+    context: Context,
+    mainViewModel: MainViewModel
+){
+    val auth = FirebaseAuth.getInstance()
+
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener {task ->
+            if(task.isSuccessful){
+                mainViewModel.user = auth.currentUser
+                // After signing in, fetch data from Firestore and upsert into local db.
+                mainViewModel.syncDataFromFirestore(auth.currentUser)
+            }else{
+                Toast.makeText(
+                    context,
+                    "Authentication failed.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
 }

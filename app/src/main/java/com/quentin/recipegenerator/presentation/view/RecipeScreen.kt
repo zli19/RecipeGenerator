@@ -40,7 +40,7 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
 
     val recipe = mainViewModel.recipeState.recipe
 
-    if(recipe.name.isNotBlank()){
+    if(recipe.name != null){
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
@@ -69,27 +69,29 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
                     fontSize = TextUnit(30f, TextUnitType.Sp),
                     textAlign = TextAlign.Center
                 )
-                if (recipe.id == 0L){
-                    IconButton(
-                        onClick = {
-                            mainViewModel.onLikeButtonClicked()
+                if(mainViewModel.user != null){
+                    if (recipe.id == 0L){
+                        IconButton(
+                            onClick = {
+                                mainViewModel.onLikeButtonClicked()
+                            }
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.icons8_like_regular_100),
+                                contentDescription = "add to book"
+                            )
                         }
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.icons8_like_regular_100),
-                            contentDescription = "add to book"
-                        )
-                    }
-                }else{
-                    IconButton(
-                        onClick = {
-                            mainViewModel.onUnlikeButtonClicked()
+                    }else{
+                        IconButton(
+                            onClick = {
+                                mainViewModel.onUnlikeButtonClicked()
+                            }
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.icons8_like_red_100),
+                                contentDescription = "delete from book"
+                            )
                         }
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.icons8_like_red_100),
-                            contentDescription = "add to book"
-                        )
                     }
                 }
             }
@@ -105,7 +107,7 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = recipe.info,
+                    text = recipe.info!!,
                     modifier = Modifier
                         .padding(10.dp)
                         .weight(1f),
@@ -114,16 +116,15 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
                     fontSize = TextUnit(16f, TextUnitType.Sp),
                     textAlign = TextAlign.Start
                 )
-
-                IconButton(
-                    onClick = {
-                        mainViewModel.onGenerateButtonClicked(navController = navController)
-                    },
-                    modifier = Modifier
-                        .fillMaxHeight(0.4F),
-                    enabled = mainViewModel.recipeState.status != RecipeStatus.GENERATING
-                ) {
-                    Image(painter = painterResource(id = R.drawable.icons8_reset_100), contentDescription = "regenerate")
+                if(mainViewModel.user != null){
+                    IconButton(
+                        onClick = {
+                            mainViewModel.onGenerateButtonClicked(navController = navController)
+                        },
+                        enabled = mainViewModel.recipeState.status != RecipeStatus.GENERATING
+                    ) {
+                        Image(painter = painterResource(id = R.drawable.icons8_reset_100), contentDescription = "regenerate")
+                    }
                 }
             }
 
@@ -153,7 +154,7 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
                     )
 
                     Text(
-                        text = recipe.ingredients,
+                        text = recipe.ingredients!!,
                         modifier = Modifier
                             .fillMaxWidth(),
                         fontSize = TextUnit(18f, TextUnitType.Sp),
@@ -177,7 +178,7 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
                 color = Primary
             )
             Text(
-                text = recipe.directions,
+                text = recipe.directions!!,
                 color = Secondary,
                 fontFamily = FontFamily.Serif,
                 modifier = Modifier
@@ -203,7 +204,7 @@ fun RecipeScreen(navController: NavController, mainViewModel: MainViewModel){
                 color = Primary
             )
             Text(
-                text = recipe.nutrition,
+                text = recipe.nutrition!!,
                 color = Secondary,
                 fontFamily = FontFamily.Serif,
                 modifier = Modifier

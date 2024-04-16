@@ -5,7 +5,7 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization") version "1.9.22"
-
+    id("com.google.gms.google-services")
 }
 
 val ktor_version: String by project
@@ -143,6 +143,11 @@ dependencies {
 
     // coil
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
 }
 
 

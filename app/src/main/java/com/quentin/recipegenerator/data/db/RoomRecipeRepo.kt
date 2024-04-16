@@ -26,4 +26,12 @@ class RoomRecipeRepo(context: Context) : RecipeRepository {
     override suspend fun getRecipeById(id: Long): Recipe {
         return recipeDao.getRecipe(id)
     }
+
+    override suspend fun upsertAllRecipes(recipes: List<Recipe>) {
+        recipeDao.upsertAllRecipes(recipes)
+    }
+
+    override suspend fun clear() {
+        recipeDao.clear()
+    }
 }

@@ -31,7 +31,7 @@ class GenerateRecipe @Inject constructor(
             recipe?.let {
                 it.preferences = preferences
                 it.requirements = requirements
-                it.picture = pictureService.fetchPicture(it.prompt)
+                it.picture = pictureService.fetchPicture(it.prompt!!)
             }
             return@withContext recipe
         }

@@ -46,7 +46,7 @@ fun RecipeCard(recipe: Recipe, mainViewModel:MainViewModel, navController: NavCo
                 .clip(RoundedCornerShape(15.dp))
         )
         Text(
-            text = recipe.name,
+            text = recipe.name!!,
             Modifier
                 .fillMaxWidth()
                 .padding(5.dp),
@@ -55,7 +55,7 @@ fun RecipeCard(recipe: Recipe, mainViewModel:MainViewModel, navController: NavCo
             textAlign = TextAlign.Center
         )
         Text(
-            text = recipe.info,
+            text = recipe.info!!,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()

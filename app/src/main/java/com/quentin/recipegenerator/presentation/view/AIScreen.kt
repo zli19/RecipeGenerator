@@ -74,7 +74,7 @@ fun AIScreen(
 
     // Local variable to store values of selected preference tags
     val preferences = remember{
-        mutableStateListOf<String>()
+        mutableStateListOf(*(mainViewModel.recipeState.recipe.preferences.toTypedArray()))
     }
 
     Column(
@@ -123,7 +123,7 @@ fun AIScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(all = 10.dp),
-            enabled = mainViewModel.recipeState.status != RecipeStatus.GENERATING
+            enabled = mainViewModel.user != null && mainViewModel.recipeState.status != RecipeStatus.GENERATING
         ) {
             if(mainViewModel.recipeState.status != RecipeStatus.GENERATING){
                 Text(text = "Get Recipe", fontSize = TextUnit(16f, TextUnitType.Sp), color = Stroke )
