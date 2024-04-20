@@ -4,10 +4,10 @@ import android.content.Context
 import com.quentin.recipegenerator.data.db.roomdb.RecipeDao
 import com.quentin.recipegenerator.data.db.roomdb.RecipeDatabase
 import com.quentin.recipegenerator.domain.model.Recipe
-import com.quentin.recipegenerator.domain.repository.RecipeRepository
+import com.quentin.recipegenerator.domain.repository.LocalRecipeRepository
 import kotlinx.coroutines.flow.Flow
 
-class RoomRecipeRepo(context: Context) : RecipeRepository {
+class RoomLocalRecipeRepo(context: Context) : LocalRecipeRepository {
 
     private var recipeDao: RecipeDao = RecipeDatabase.getInstance(context).recipeDao()
 

@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.quentin.recipegenerator.presentation.ui.theme.Background
@@ -44,6 +46,9 @@ import com.quentin.recipegenerator.presentation.ui.theme.Headline
 import com.quentin.recipegenerator.presentation.ui.theme.Secondary
 import com.quentin.recipegenerator.presentation.ui.theme.Stroke
 import com.quentin.recipegenerator.presentation.viewmodel.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel, context: Context){
@@ -122,7 +127,7 @@ fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel, contex
                             containerColor = ButtonOrHighlight
                         ),
                         onClick = {
-                            performSignIn(email, password, context, mainViewModel)
+                            mainViewModel.signIn(email, password, context)
                             keyboardController?.hide()
                             onDismissRequest()
                         }
@@ -134,28 +139,4 @@ fun LoginDialog(onDismissRequest: ()->Unit, mainViewModel: MainViewModel, contex
         }
 
     }
-}
-
-fun performSignIn(
-    email: String,
-    password: String,
-    context: Context,
-    mainViewModel: MainViewModel
-){
-    val auth = FirebaseAuth.getInstance()
-
-    auth.signInWithEmailAndPassword(email, password)
-        .addOnCompleteListener {task ->
-            if(task.isSuccessful){
-                mainViewModel.user = auth.currentUser
-                // After signing in, fetch data from Firestore and upsert into local db.
-                mainViewModel.syncDataFromFirestore(auth.currentUser)
-            }else{
-                Toast.makeText(
-                    context,
-                    "Authentication failed.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
 }

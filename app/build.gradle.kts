@@ -14,12 +14,12 @@ fun Project.propertyOrEmpty(name: String): String {
     val property = findProperty(name) as String?
     return property ?: ""
 }
+
 fun Project.buildConfigProperty(name: String) = "\"${propertyOrEmpty(name)}\""
 
 android {
     namespace = "com.quentin.recipegenerator"
     compileSdk = 34
-
 
     signingConfigs {
         create("openai") {
@@ -109,7 +109,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
 
-
     // dagger.hilt
     implementation("com.google.dagger:hilt-android:2.51")
     kapt("com.google.dagger:hilt-android-compiler:2.51")
@@ -149,7 +148,6 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
 }
-
 
 // Allow references to generated code
 kapt {

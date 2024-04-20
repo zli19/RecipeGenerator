@@ -10,8 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 // Represent the use case of recipe generation
-@Singleton
-class GenerateRecipe @Inject constructor(
+class GenerateRecipe(
     private val aiService: AIService,
     private val pictureService: PictureService,
 ) {
@@ -20,20 +19,18 @@ class GenerateRecipe @Inject constructor(
         requirements: String,
         preferences: List<String>,
         exclusions: List<String>
-    ): Recipe? {
-        return withContext(Dispatchers.IO) {
-            // Wait until generate a recipe with requirements and preferences from user input.
-            val recipe = async {
-                aiService.generateRecipe(requirements, preferences, exclusions)
-            }.await()
+    ): Recipe? = withContext(Dispatchers.IO) {
+        // Wait until generate a recipe with requirements and preferences from user input.
+        val recipe = async {
+            aiService.generateRecipe(requirements, preferences, exclusions)
+        }.await()
 
-            // Synchronously assign features and picture to generated recipe object.
-            recipe?.let {
-                it.preferences = preferences
-                it.requirements = requirements
-                it.picture = pictureService.fetchPicture(it.prompt!!)
-            }
-            return@withContext recipe
+        // Synchronously assign features and picture to generated recipe object.
+        recipe?.let {
+            it.preferences = preferences
+            it.requirements = requirements
+            it.picture = pictureService.fetchPicture(it.prompt!!)
         }
+        return@withContext recipe
     }
 }

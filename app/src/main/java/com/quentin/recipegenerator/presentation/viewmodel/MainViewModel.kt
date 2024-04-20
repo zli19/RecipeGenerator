@@ -1,6 +1,6 @@
 package com.quentin.recipegenerator.presentation.viewmodel
 
-import android.util.Log
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -11,31 +11,21 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.SetOptions
-import com.google.firebase.firestore.auth.User
-import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.toObject
 import com.quentin.recipegenerator.domain.model.Recipe
-import com.quentin.recipegenerator.domain.repository.RecipeRepository
-import com.quentin.recipegenerator.domain.usecase.GenerateRecipe
+import com.quentin.recipegenerator.domain.model.User
+import com.quentin.recipegenerator.domain.usecase.UseCases
 import com.quentin.recipegenerator.presentation.view.navigation.Destination
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import kotlin.jvm.Throws
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val repository: RecipeRepository,
-    private val generateRecipe: GenerateRecipe
+    private val useCases: UseCases
 ): ViewModel(){
     // Local variable to store current user
-    var user by mutableStateOf<FirebaseUser?>(null)
+    var user by mutableStateOf<User?>(null)
     // Local variable to store current destination
     var currentScreen by mutableStateOf<Destination>(Destination.AI)
 
@@ -46,14 +36,11 @@ class MainViewModel @Inject constructor(
     var recipeBook by mutableStateOf<List<Recipe>>(emptyList())
     // Local variable to store all preference tags for display
     var preferenceMap = mutableStateMapOf<String, Int>()
-    // Firestore instance
-    private val fs = Firebase.firestore
-
 
     init {
         // Retrieve data from database
-        viewModelScope.launch {
-            repository.getAllRecipes().collectLatest { recipes ->
+        viewModelScope.launch(Dispatchers.IO){
+            useCases.dataPersistence.getAllLocalRecipes().collectLatest { recipes ->
                 recipeBook = recipes
                 val map = HashMap<String, Int>()
                 for (preference in recipeBook.flatMap { it.preferences }) {
@@ -64,12 +51,47 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // Sign in a user with provided credentials
+    fun signIn(
+        email: String,
+        password: String,
+        context: Context
+    ) = viewModelScope.launch{
+        val newUser = async {
+            useCases.userAuthentication.signIn(email, password)
+        }.await()
+        if(newUser != null){
+            if(hasUserChanged(newUser)){
+                recipeState = RecipeState()
+                preferenceMap.clear()
+            }
+            // Synchronize local data with remote data
+            useCases.dataPersistence
+                .syncLocalDataFromRemote(newUser, hasUserChanged(newUser))
+            user = newUser
+
+        }else{
+            Toast.makeText(
+                context,
+                "Authentication failed.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    // Sign out a user
+    fun signOut()= viewModelScope.launch{
+        useCases.userAuthentication.signOut()
+        user = null
+    }
+
+
     // Handles the click event for the generate and regenerate button.
     fun onGenerateButtonClicked(
         requirements: String = "",
         preferences: List<String> = emptyList(),
         navController: NavController
-    ) = viewModelScope.launch {
+    ) = viewModelScope.launch{
 
         if(requirements.isNotBlank()){
             // When requirements is not blank, it is new round of recipe generation.
@@ -85,7 +107,7 @@ class MainViewModel @Inject constructor(
                     this.requirements,
                     this.preferences,
                     recipeState.history
-                )
+                ).join()
             }
         }
 
@@ -110,25 +132,22 @@ class MainViewModel @Inject constructor(
     // Insert recipe into book
     fun onLikeButtonClicked() = viewModelScope.launch {
         recipeState.recipe.apply {
-            val id = repository.insertRecipe(this)
-            repository.getRecipeById(id).apply {
+            useCases.dataPersistence.saveRecipe(this, user!!).apply {
                 recipeState = recipeState.copy(
                     recipe = this
                 )
-                addRecipeToFirestore(user, this)
             }
         }
     }
 
     // Delete recipe from book
-    fun onUnlikeButtonClicked()= viewModelScope.launch{
+    fun onDislikeButtonClicked()= viewModelScope.launch{
         recipeState.recipe.apply {
-            repository.deleteRecipe(this)
+            useCases.dataPersistence.deleteRecipe(this, user!!)
             val recipe = this.copy(id = 0L)
             recipeState = recipeState.copy(
                 recipe = recipe
             )
-            deleteRecipeFromFirestore(user, this)
         }
     }
 
@@ -137,7 +156,7 @@ class MainViewModel @Inject constructor(
         requirements: String,
         preferences: List<String>,
         exclusions: List<String> = emptyList()
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    ) = viewModelScope.launch {
 
         // Change recipeState status to GENERATING
         recipeState = recipeState.copy(
@@ -145,7 +164,7 @@ class MainViewModel @Inject constructor(
         )
 
         // Start to generate recipe and assign it to recipeState
-        generateRecipe(
+        useCases.generateRecipe(
             requirements = requirements,
             preferences = preferences,
             exclusions = exclusions
@@ -164,71 +183,8 @@ class MainViewModel @Inject constructor(
         )
     }
 
-    // Retrieve recipe data from Firestore and upsert into local room db
-    fun syncDataFromFirestore(user: FirebaseUser?) = viewModelScope.launch(Dispatchers.IO){
-        if(user == null) return@launch
-
-        fs.collection("recipeGPT")
-            .document(user.email!!)
-            .collection("recipes")
-            .get()
-            .addOnSuccessListener {documents->
-                documents.map { document->
-                    document.toObject<Recipe>()
-                }.apply {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        if(hasUserChanged(user)){
-                            recipeState = RecipeState()
-                            preferenceMap.clear()
-                            async {
-                                repository.clear()
-                            }.await()
-                        }
-                        repository.upsertAllRecipes(this@apply)
-                    }
-                }
-            }
-            .addOnFailureListener{exception->
-                Log.w("FireStore", "Error getting documents: ", exception)
-            }
-    }
-
-    // Add a recipe to Firestore
-    private fun addRecipeToFirestore(user: FirebaseUser?, recipe: Recipe) = viewModelScope.launch(Dispatchers.IO){
-        if(user == null) return@launch
-
-        fs.collection("recipeGPT")
-            .document(user.email!!)
-            .collection("recipes")
-            .document(recipe.id.toString())
-            .set(recipe, SetOptions.merge())
-            .addOnSuccessListener {
-                Log.i("FireStore", "Success setting recipe ${recipe.name}")
-            }
-            .addOnFailureListener{ e ->
-                Log.w("FireStore", "Error setting document", e)
-            }
-    }
-
-    // Delete a recipe from Firestore
-    private fun deleteRecipeFromFirestore(user: FirebaseUser?, recipe: Recipe) = viewModelScope.launch(Dispatchers.IO){
-        if(user == null) return@launch
-
-        fs.collection("recipeGPT")
-            .document(user.email!!)
-            .collection("recipes")
-            .document(recipe.id.toString())
-            .delete()
-            .addOnSuccessListener {
-                Log.i("FireStore", "Success deleting recipe ${recipe.name}")
-            }
-            .addOnFailureListener{ e ->
-                Log.w("FireStore", "Error deleting document", e)
-            }
-    }
-
     // Check if logged in user is the owner of the recipe book.
-    private fun hasUserChanged(user: FirebaseUser): Boolean{
+    private fun hasUserChanged(user: User): Boolean{
         if(recipeBook.isEmpty()) return false
         return user.uid != recipeBook[0].uid
     }

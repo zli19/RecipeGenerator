@@ -103,7 +103,7 @@ fun TopNav(
                     Spacer(modifier = Modifier.width(2.dp))
 
                     IconButton(
-                        onClick = { signOut(mainViewModel) }
+                        onClick = { mainViewModel.signOut() }
                     ){
                         Icon(
                             imageVector = Icons.Filled.ExitToApp,
@@ -127,10 +127,4 @@ fun TopNav(
             context
         )
     }
-}
-
-fun signOut(mainViewModel: MainViewModel){
-    val auth = FirebaseAuth.getInstance()
-    auth.signOut()
-    mainViewModel.user = null
 }

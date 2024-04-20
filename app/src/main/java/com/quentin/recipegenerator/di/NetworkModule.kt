@@ -59,5 +59,4 @@ object NetworkModule {
     ): PictureService {
         return StabilityAIPictureService(stabilityAPIService, appContext)
     }
-
 }
