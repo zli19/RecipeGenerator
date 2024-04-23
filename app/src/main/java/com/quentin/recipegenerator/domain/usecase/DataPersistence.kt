@@ -8,9 +8,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 // Represent use cases related to data persistence
-class DataPersistence(
+@Singleton
+class DataPersistence @Inject constructor(
     private val localRecipeRepository: LocalRecipeRepository,
     private val remoteRecipeRepository: RemoteRecipeRepository
 ) {

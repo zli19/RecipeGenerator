@@ -6,6 +6,7 @@ import android.util.Log
 import com.quentin.openai_api_demo.model.ReqBody
 import com.quentin.openai_api_demo.model.TextPrompt
 import com.quentin.recipegenerator.domain.service.PictureService
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -14,10 +15,13 @@ import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class StabilityAIPictureService(
+@Singleton
+class StabilityAIPictureService @Inject constructor(
     private val stabilityAPIService: StabilityAPIService,
-    private val context: Context
+    @ApplicationContext private val context: Context
 ): PictureService {
     private val engineId = "stable-diffusion-v1-6"
     private var fos: FileOutputStream? = null

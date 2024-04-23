@@ -10,7 +10,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 // Represent the use case of recipe generation
-class GenerateRecipe(
+@Singleton
+class GenerateRecipe @Inject constructor(
     private val aiService: AIService,
     private val pictureService: PictureService,
 ) {

@@ -11,8 +11,13 @@ import com.aallam.openai.client.OpenAI
 import com.quentin.recipegenerator.domain.model.Recipe
 import com.quentin.recipegenerator.domain.service.AIService
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class RecipeAIService(private val openAI: OpenAI): AIService {
+@Singleton
+class RecipeAIService @Inject constructor(
+    private val openAI: OpenAI
+): AIService {
 
     private val initialMessages = listOf(
         chatMessage {

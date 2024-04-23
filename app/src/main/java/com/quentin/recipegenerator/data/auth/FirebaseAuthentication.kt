@@ -1,4 +1,4 @@
-package com.quentin.recipegenerator.auth
+package com.quentin.recipegenerator.data.auth
 
 import android.util.Log
 import com.google.firebase.Firebase
@@ -8,8 +8,11 @@ import com.quentin.recipegenerator.domain.service.AuthenticationService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class FirebaseAuthentication: AuthenticationService {
+@Singleton
+class FirebaseAuthentication @Inject constructor(): AuthenticationService {
 
     private val auth = Firebase.auth
     override suspend fun signIn(

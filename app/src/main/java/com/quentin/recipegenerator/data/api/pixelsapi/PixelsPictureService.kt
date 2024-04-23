@@ -6,8 +6,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import retrofit2.awaitResponse
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PixelsPictureService(
+@Singleton
+class PixelsPictureService @Inject constructor(
     private val pixelsApiService: PixelsAPIService
 ): PictureService {
     override suspend fun fetchPicture(prompt: String): String? {

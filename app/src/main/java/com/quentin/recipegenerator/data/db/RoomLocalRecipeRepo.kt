@@ -5,9 +5,15 @@ import com.quentin.recipegenerator.data.db.roomdb.RecipeDao
 import com.quentin.recipegenerator.data.db.roomdb.RecipeDatabase
 import com.quentin.recipegenerator.domain.model.Recipe
 import com.quentin.recipegenerator.domain.repository.LocalRecipeRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class RoomLocalRecipeRepo(context: Context) : LocalRecipeRepository {
+@Singleton
+class RoomLocalRecipeRepo @Inject constructor(
+    @ApplicationContext private val context: Context
+) : LocalRecipeRepository {
 
     private var recipeDao: RecipeDao = RecipeDatabase.getInstance(context).recipeDao()
 

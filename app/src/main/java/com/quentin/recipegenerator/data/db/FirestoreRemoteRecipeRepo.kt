@@ -9,8 +9,11 @@ import com.quentin.recipegenerator.domain.model.Recipe
 import com.quentin.recipegenerator.domain.model.User
 import com.quentin.recipegenerator.domain.repository.RemoteRecipeRepository
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class FirestoreRemoteRecipeRepo: RemoteRecipeRepository {
+@Singleton
+class FirestoreRemoteRecipeRepo @Inject constructor(): RemoteRecipeRepository {
 
     val fs = Firebase.firestore
 
